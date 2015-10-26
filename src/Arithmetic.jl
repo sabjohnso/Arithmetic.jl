@@ -17,6 +17,7 @@
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ### Code:
+
 module Arithmetic
 
 import Base.+, Base.-, Base.*, Base./, Base.^, Base.%

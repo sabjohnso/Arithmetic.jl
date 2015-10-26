@@ -20,3 +20,45 @@
 
 using Arithmetic
 using FactCheck
+
+
+import Base.==
+import Arithmetic.apply_unary, Arithmetic.apply_binary
+
+type SimpleWrapper{ T } <: AbstractArithmetic
+    value::T
+end
+
+==( a::SimpleWrapper, b::SimpleWrapper ) = a.value == b.value
+
+apply_unary{ T }( f::Function, x::SimpleWrapper{ T } ) =
+    SimpleWrapper( f( x.value ))
+
+apply_binary{ T }( f::Function, x::SimpleWrapper{ T }, y::SimpleWrapper{ T }) =
+    SimpleWrapper( f( x.value, y.value ))
+
+
+facts( "Arithmetic" ) do
+    
+    @fact isArithmetic( "Hello, World" ) --> false
+    @fact isArithmetic( typeof( "Hello, World!" )) --> false
+
+    a = SimpleWrapper( 1 )
+
+    @fact isArithmetic( a ) --> true
+    @fact isArithmetic( typeof( a )) --> true
+    @fact apply_unary( -, a ) --> SimpleWrapper( -a.value )
+    @fact +a --> a
+    @fact -a --> SimpleWrapper( -a.value )
+
+    b = SimpleWrapper( 2 )
+
+    @fact isArithmetic( b ) --> true
+    @fact a+b --> SimpleWrapper( a.value + b.value )
+    @fact a-b --> SimpleWrapper( a.value - b.value )
+    @fact a*b --> SimpleWrapper( a.value * b.value )
+    @fact a/b --> SimpleWrapper( a.value / b.value )
+    @fact a^b --> SimpleWrapper( a.value ^ b.value )
+    @fact a%b --> SimpleWrapper( a.value % b.value )
+        
+end

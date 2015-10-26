@@ -19,7 +19,31 @@
 ### Code:
 module Arithmetic
 
+import Base.+, Base.-, Base.*, Base./, Base.^, Base.%
+
+export AbstractArithmetic, isArithmetic, apply_unary, apply_binary, +, -, *, /, ^, %
+
 abstract AbstractArithmetic
+
+
+isArithmetic{T}( ::Type{T} ) = T <: AbstractArithmetic
+isArithmetic{T}( ::T ) = isArithmetic( T )
+
+apply_unary( f, x ) = f( x )
+apply_binary( f, x, y  ) = f( x, y )
+
+
+for op in (:+, :-)
+    @eval $op{T <: AbstractArithmetic}( a::T ) = apply_unary( $op, a )
+end
+
+for op in ( :+, :-, :*, :/, :^, :%)
+    @eval $op{T <: AbstractArithmetic}( a::T, b::T ) = apply_binary( $op, a, b )
+end
+
+
+
+
 
 
 

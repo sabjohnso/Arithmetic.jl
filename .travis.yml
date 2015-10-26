@@ -11,6 +11,6 @@ notifications:
 
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e 'Pkg.clone(pwd()); Pkg.build("Arithmetic"); Pkg.test("Arithmetic", coverage=true)'
+  - julia -e 'Pkg.clone( "https://github.com/sabjohnso/Applicator.jl", "Applicator" ); Pkg.clone(pwd()); Pkg.build("Arithmetic"); Pkg.test("Arithmetic", coverage=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("Arithmetic")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'

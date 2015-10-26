@@ -21,17 +21,17 @@
 module Arithmetic
 
 import Base.+, Base.-, Base.*, Base./, Base.^, Base.%
+import Applicator.apply_unary, Applicator.apply_binary
 
 export AbstractArithmetic, isArithmetic, apply_unary, apply_binary, +, -, *, /, ^, %
+
+
 
 abstract AbstractArithmetic
 
 
 isArithmetic{T}( ::Type{T} ) = T <: AbstractArithmetic
 isArithmetic{T}( ::T ) = isArithmetic( T )
-
-apply_unary( f, x ) = f( x )
-apply_binary( f, x, y  ) = f( x, y )
 
 
 for op in (:+, :-)

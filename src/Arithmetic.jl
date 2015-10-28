@@ -78,6 +78,24 @@ macro make_binary_op_homog( T, A, op )
     esc(:( $op{ $T <: $A }( a::$T, b::$T ) = apply_binary( $op, a, b )))
 end
 
+
+"
+@make_binary_op_alt
+---------------
+A macro to define a single binary operator for the specified type and
+between the specified type and an alternate type.  The
+behavior of the operator is derived from the `apply binary`
+method for the subtype.
+"
+macro make_binary_op_alt( A, Alt, op )
+    esc(:( $op( a::$A, b::$A ) = apply_binary( $op, a, b )
+           $op( a::$Alt, b::$A ) = apply_binary( $op, a, b )
+           $op( a::$A, b::$Alt ) = apply_binary( $op, a, b )))
+end
+          
+
+
+
 "
 @make_unary_ops
 ---------------
@@ -88,7 +106,7 @@ type.  The behavior is derive through the
 "
 macro make_unary_ops( A )
     esc(:( for op in unary_ops
-               @make_unary_op $A op
+           @make_unary_op $A op
            end ))
 end
 
@@ -106,7 +124,6 @@ macro make_binary_ops( A )
            end ))
 end
 
-
 "
 @make_binary_ops_homog <T> <AbstractType>
 -----------------------------------------
@@ -120,6 +137,19 @@ the abstract type.
 macro make_binary_ops_homog( T,  A )
     esc(:( for op in binary_ops
            @make_binary_op_homog $T $A op
+           end ))
+end
+
+"
+@make_binary_ops_alt <Type> <AlternateType>
+-------------------------------------------
+Derive each of the binary arithmetic operators
+(Arithmetic.binary_ops) for the specified
+type and the alternate type.
+"
+macro make_binary_ops_alt( A, Alt )
+    esc(:( for op in binary_ops
+           @make_binary_op_alt $A $Alt
            end ))
 end
           

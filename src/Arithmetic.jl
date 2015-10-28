@@ -23,8 +23,11 @@ module Arithmetic
 import Base.+, Base.-, Base.*, Base./, Base.^, Base.%
 import Applicator.apply_unary, Applicator.apply_binary
 
-export @make_unary_op, @make_binary_op, @make_binary_op_homog
-export @make_unary_ops, @make_binary_ops, @make_binary_ops_homog
+export unary_ops, binary_ops
+
+export @make_unary_op, @make_binary_op, @make_binary_op_alt, @make_binary_op_homog
+export @make_unary_ops, @make_binary_ops, @make_binary_ops_alt, @make_binary_ops_homog
+
 export AbstractArithmetic, isArithmetic, apply_unary, apply_binary, +, -, *, /, ^, %
 
 "
@@ -88,9 +91,18 @@ behavior of the operator is derived from the `apply binary`
 method for the subtype.
 "
 macro make_binary_op_alt( A, Alt, op )
-    esc(:( $op( a::$A, b::$A ) = apply_binary( $op, a, b )
-           $op( a::$Alt, b::$A ) = apply_binary( $op, a, b )
-           $op( a::$A, b::$Alt ) = apply_binary( $op, a, b )))
+
+    if (A == :T) || (Alt == :T)
+        T = Symbol( string( "T", randstring( 20 )))
+    else
+        T = :T
+    end
+    
+    esc(quote
+        $op( a::$A, b::$A ) = apply_binary( $op, a, b )
+        $op{ $T <: $A }( a::$Alt, b::$T ) = apply_binary( $op, a, b )
+        $op{ $T <: $A }( a::$T, b::$Alt ) = apply_binary( $op, a, b )
+        end)
 end
           
 
@@ -149,7 +161,7 @@ type and the alternate type.
 "
 macro make_binary_ops_alt( A, Alt )
     esc(:( for op in binary_ops
-           @make_binary_op_alt $A $Alt
+           @make_binary_op_alt $A $Alt op
            end ))
 end
           
